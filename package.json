@@ -1,0 +1,21 @@
+{
+  "name": "backend-api",
+  "version": "1.0.0",
+  "description": "api tcc",
+  "main": "index.js",
+  "author": "Rogelso Salci",
+  "license": "ISC",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4",
+    "pg": "^8.3.0",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.3"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.2.0"
+  }
+}
