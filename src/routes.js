@@ -23,4 +23,11 @@ routes.get('/users/:id_user/talhoes', TalhaoController.findAllTalhoesUser);
 routes.get('/users/:id_user/talhoes/:id_talhao', TalhaoController.findOneTalhoesUser);
 routes.put('/users/:id_user/talhoes/:id_talhao', TalhaoController.updateTalhao); 
 routes.delete('/users/:id_user/talhoes/:id_talhao', TalhaoController.deleteTalhao); 
+
+
+//rota login
+routes.post('/login', UserController.login);
+
+
+
 module.exports = routes;

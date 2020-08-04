@@ -2,17 +2,36 @@ const User = require("../models/User");
 const Talhao = require("../models/Talhao");
 const {Op} = require('sequelize');
 
+// validator
+const Validator = require('fastest-validator');
+const v = new Validator();
+const filterValidator = {
+    nome: {max:30, min:4, type: 'string'},
+    localizacao: {max:30, min:5, type: 'string'},
+    desc_talhao: {max:30, type: 'string'},
+    qtda_ha: {min:1,type: 'number', optional: false}
+}
+
 module.exports = {
     async store(req, res){
         const {id_user} = req.params;
-        const {nome, localizacao, desc_talhao, qtda_ha} = req.body;
-
+        //const {nome, localizacao, desc_talhao, qtda_ha} = req.body;
+        const nome = req.body.nome.trim();
+        const localizacao = req.body.localizacao.trim();
+        const desc_talhao = req.body.desc_talhao.trim();
+        const qtda_ha = req.body.qtda_ha;
+        
+        //ver se user existe
         const user = await User.findByPk(id_user);
-       
         if (!user){
-            return res.status(400).json({error: 'Usuário não encontrado'});
-            
+            return res.status(400).json({error: 'Usuário não encontrado'});           
         }
+
+        const errors = v.validate(req.body, filterValidator);
+        if (Array.isArray(errors) && errors.length){
+            return res.status(400).json(errors);
+        }
+
         const talhao = await Talhao.create({ 
             id_user,
             nome,
@@ -64,11 +83,20 @@ module.exports = {
         try{
             const {id_talhao} = req.params;
             const {id_user} = req.params;
-            const{nome, localizacao, desc_talhao, qtda_ha} = req.body;
+
+            const nome = req.body.nome.trim();
+            const localizacao = req.body.localizacao.trim();
+            const desc_talhao = req.body.desc_talhao.trim();
+            const qtda_ha = req.body.qtda_ha;
 
             const talhao = await Talhao.findByPk(id_talhao);
             if (!talhao){
                 return res.status(400).json({error: 'Talhão não encontrado'});               
+            }
+
+            const errors = v.validate(req.body, filterValidator);
+            if (Array.isArray(errors) && errors.length){
+                return res.status(400).json(errors);
             }
             
             const [updated] = await Talhao.update({
@@ -102,6 +130,11 @@ module.exports = {
         try{
             const {id_user} = req.params;
             const {id_talhao} = req.params;    
+            
+            const scanTalhao = await Talhao.findByPk(id_talhao);
+            if (!scanTalhao){
+                return res.status(400).json({error: 'Talhão não encontrado'});               
+            }
             const talhao = await Talhao.destroy({
                 where: {
                    id: id_talhao,
@@ -110,7 +143,7 @@ module.exports = {
              }).then(function(rowDeleted){ 
                if(rowDeleted === 1){
                   console.log('Deleted successfully');
-                  return res.status(200).json({sucesso: 'Usuário deletado'});
+                  return res.status(200).json({sucesso: 'Talhão deletado'});
                 }else{
                   console.log('Erro no delete do talhao');
                   return res.status(400).json({Erro: 'Não foi possivel deletar o Talhão'});

@@ -1,10 +1,38 @@
 const User = require("../models/User");
 
+
+// validator
+const Validator = require('fastest-validator');
+const v = new Validator();
+const filterValidator = {
+    nome: {max:30, min:4, type: 'string'},
+    sobrenome: {max:30, min:4, type: 'string'},
+    email: {max:30, min:11, type: 'email'},
+    password: {max:25, min:8, type: 'string'},
+    cidade: {max:30, min:5, type: 'string', trimRight:true}
+}
+// require('str-trim');
+// const { body } = require('express-validator');
+
+
+
+
+
 module.exports = {
     async store(req, res){
         try{
-        const{nome, sobrenome, email, password, cidade} = req.body;
+        //const{nome,sobrenome, email, password, cidade} = req.body;
+        const nome = req.body.nome.trim();
+        const sobrenome = req.body.sobrenome.trim();
+        const email = req.body.email.trim();
+        const password = req.body.password.trim();
+        const cidade = req.body.cidade.trim();
 
+        const errors = v.validate(req.body, filterValidator);
+
+        if (Array.isArray(errors) && errors.length){
+            return res.status(400).json(errors);
+        }
         //await é para deixar a manipulacao no db assincrona, espera terminar para continuar     
         const user = await User.create({nome, sobrenome,email,password,cidade});
 
@@ -38,13 +66,23 @@ module.exports = {
     async updateUser(req, res){
         try{
             const {id_user} = req.params;
-            const{nome, sobrenome, email, password, cidade} = req.body;
+            //const{nome,sobrenome, email, password, cidade} = req.body;
+            const nome = req.body.nome.trim('_').trim();
+            const sobrenome = req.body.sobrenome.trim('_').trim();
+            const email = req.body.email.trim('_').trim();
+            const password = req.body.password.trim('_').trim();
+            const cidade = req.body.cidade.trim('_').trim();
 
             const scanUser = await User.findByPk(id_user);
 
             if (!scanUser){
                 return res.status(400).json({error: 'Usuário não encontrado'});               
             } 
+
+            const errors = v.validate(req.body, filterValidator);
+            if (Array.isArray(errors) && errors.length){
+                return res.status(400).json(errors);
+            }
 
             const [updated] = await User.update({
                 nome : nome, 
@@ -76,6 +114,12 @@ module.exports = {
         try{
             const {id_user} = req.params;
                 
+            const scanUser = await User.findByPk(id_user);
+
+            if (!scanUser){
+                return res.status(400).json({error: 'Usuário não encontrado'});               
+            }
+                       
             const user = await User.destroy({
                 where: {
                    id: id_user 
@@ -95,5 +139,44 @@ module.exports = {
             return res.status(400).json({error: err.message});            
         }
     },
+
+
+    async login(req, res){
+        try{
+            const{email, password} = req.body;    
+            const filterValidatorLogin = {
+                email: {max:30, min:11, type: 'email'},
+                password: {max:25, min:8, type: 'string'}
+            }
+            
+            const errors = v.validate(req.body, filterValidatorLogin);
+
+            if (Array.isArray(errors) && errors.length){
+                return res.status(400).json(errors);
+            }
+
+            const authUser = await User.findOne({
+                where: {
+                    email: email,
+                    password: password 
+                 }
+                }
+            );
+                
+            if(authUser){
+                console.log('Login ok');
+                return res.json(authUser);               
+            }else
+            {
+                console.log('Usuário ou Senha inválida');
+                return res.status(401).json({erro: 'Usuário ou Senha inválida'});
+            }
+             
+         } catch (err){
+             return res.status(400).json({error: err.message});            
+         }
+    },
+
+    
 
 }

@@ -10,10 +10,15 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "express-validator": "^6.6.1",
+    "fastest-validator": "^1.5.1",
     "nodemon": "^2.0.4",
     "pg": "^8.3.0",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^6.3.3"
+    "sequelize": "^6.3.3",
+    "str-trim": "^1.2.0",
+    "string-trim-spaces-only": "^2.8.17",
+    "trim-strings": "^2.0.0"
   },
   "devDependencies": {
     "sequelize-cli": "^6.2.0"
