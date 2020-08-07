@@ -16,8 +16,15 @@ class User extends Model{
 
 
     static associate(models){
-        this.hasMany(models.Talhao, { foreignKey: 'id_user', as: 'talhaos_user'});
+        this.hasMany(
+            models.Talhao, { foreignKey: 'id_user', as: 'talhaos_user'}
+            
+        );
+        this.hasMany( 
+            models.Safra, { foreignKey: 'id_user', as: 'safras_user'}
+        );
     }
+
 }
 
 

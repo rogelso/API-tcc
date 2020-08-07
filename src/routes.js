@@ -3,6 +3,7 @@ const routes = express.Router();
 
 const UserController = require('./controllers/UserController');    
 const TalhaoController = require('./controllers/TalhaoController');    
+const SafraController = require('./controllers/SafraController');    
 
 
 routes.get('/', (req, res)=> {
@@ -28,6 +29,16 @@ routes.delete('/users/:id_user/talhoes/:id_talhao', TalhaoController.deleteTalha
 //rota login
 routes.post('/login', UserController.login);
 
+
+//rotas safra
+routes.post('/users/:id_user/safras', SafraController.store);
+routes.get('/users/:id_user/safras', SafraController.findAllSafrasUser);
+routes.get('/users/:id_user/safras/:id_safra', SafraController.findOneSafrasUser);
+routes.put('/users/:id_user/safras/:id_safra/add-custo-fixo', SafraController.addCustosFixosSafra);
+routes.put('/users/:id_user/safras/:id_safra/remove-custo-fixo', SafraController.removeCustosFixosSafra);
+routes.put('/users/:id_user/safras/:id_safra/add-custo-manutencoes-maq', SafraController.addCustosManutencoesMaq);
+routes.put('/users/:id_user/safras/:id_safra/remove-custo-manutencoes-maq', SafraController.removeCustosManutencoesMaq);
+routes.delete('/users/:id_user/safras/:id_safra', SafraController.deleteSafra); 
 
 
 module.exports = routes;

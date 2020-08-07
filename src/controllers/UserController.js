@@ -11,7 +11,7 @@ const filterValidator = {
     password: {max:25, min:8, type: 'string'},
     cidade: {max:30, min:5, type: 'string', trimRight:true}
 }
-// require('str-trim');
+ require('str-trim');
 // const { body } = require('express-validator');
 
 

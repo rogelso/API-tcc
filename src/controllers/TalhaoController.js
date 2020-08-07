@@ -52,7 +52,7 @@ module.exports = {
         // const talhoes = await Talhao.findAll({ where: {id_user}});
         //return res.json(talhoes);
         
-        const user = await User.findByPk(id_user, {
+        const user = await User.findByPk(id_user, { //busca o user e vincula os talhao
             include: {association: 'talhaos_user'}
         });
         
