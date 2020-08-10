@@ -4,6 +4,7 @@ const routes = express.Router();
 const UserController = require('./controllers/UserController');    
 const TalhaoController = require('./controllers/TalhaoController');    
 const SafraController = require('./controllers/SafraController');    
+const EstoqueController = require('./controllers/EstoqueController');
 
 
 routes.get('/', (req, res)=> {
@@ -40,5 +41,13 @@ routes.put('/users/:id_user/safras/:id_safra/add-custo-manutencoes-maq', SafraCo
 routes.put('/users/:id_user/safras/:id_safra/remove-custo-manutencoes-maq', SafraController.removeCustosManutencoesMaq);
 routes.delete('/users/:id_user/safras/:id_safra', SafraController.deleteSafra); 
 
+
+
+//rotas estoque
+routes.post('/users/:id_user/safras/:id_safra/estoque', EstoqueController.store);
+routes.get('/users/:id_user/safras/:id_safra/estoque', EstoqueController.findAllProdutosSafra);
+routes.get('/users/:id_user/safras/:id_safra/estoque/:id_produto', EstoqueController.findOneProdutosSafra);
+routes.put('/users/:id_user/safras/:id_safra/estoque/:id_produto', EstoqueController.updateProduto); 
+routes.delete('/users/:id_user/safras/:id_safra/estoque/:id_produto', EstoqueController.deleteProduto); 
 
 module.exports = routes;

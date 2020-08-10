@@ -28,7 +28,7 @@ module.exports = {
         const password = req.body.password.trim();
         const cidade = req.body.cidade.trim();
 
-        const errors = v.validate(req.body, filterValidator);
+        const errors = v.validate({nome, sobrenome,email,password,cidade}, filterValidator);
 
         if (Array.isArray(errors) && errors.length){
             return res.status(400).json(errors);
@@ -79,7 +79,7 @@ module.exports = {
                 return res.status(400).json({error: 'Usuário não encontrado'});               
             } 
 
-            const errors = v.validate(req.body, filterValidator);
+            const errors = v.validate({nome, sobrenome,email,password,cidade}, filterValidator);
             if (Array.isArray(errors) && errors.length){
                 return res.status(400).json(errors);
             }

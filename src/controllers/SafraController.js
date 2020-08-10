@@ -23,7 +23,7 @@ module.exports = {
         const filterValidator = {
             ano_safra: {max:30, min:7, type: 'string'},
         }
-        const errors = v.validate(req.body, filterValidator);
+        const errors = v.validate({ano_safra}, filterValidator);
         if (Array.isArray(errors) && errors.length){
             return res.status(400).json(errors);
         }
@@ -53,8 +53,17 @@ module.exports = {
 
     async findOneSafrasUser(req, res){   
         const {id_safra} = req.params;
+        const {id_user} = req.params;
+
               
-        const safra = await Safra.findByPk(id_safra);
+        const safra = await Safra.findOne(  //era findbypk
+            { 
+                where:{
+                    id: id_safra,
+                    id_user:id_user                        
+                },
+            }
+        );
         
 
         if (!safra){

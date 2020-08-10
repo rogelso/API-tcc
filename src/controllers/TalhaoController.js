@@ -11,6 +11,7 @@ const filterValidator = {
     desc_talhao: {max:30, type: 'string'},
     qtda_ha: {min:1,type: 'number', optional: false}
 }
+require('str-trim');
 
 module.exports = {
     async store(req, res){
@@ -27,7 +28,7 @@ module.exports = {
             return res.status(400).json({error: 'Usuário não encontrado'});           
         }
 
-        const errors = v.validate(req.body, filterValidator);
+        const errors = v.validate({nome,localizacao,desc_talhao,qtda_ha}, filterValidator);
         if (Array.isArray(errors) && errors.length){
             return res.status(400).json(errors);
         }
@@ -65,10 +66,18 @@ module.exports = {
 
     async findOneTalhoesUser(req, res){   
         const {id_talhao} = req.params;
-              
-        const talhao = await Talhao.findByPk(id_talhao);
-        
+        const {id_user} = req.params;
 
+              
+        const talhao = await Talhao.findOne( //era findbypk
+            { 
+                where:{
+                    id: id_talhao,
+                    id_user:id_user                        
+                },
+            }
+            );
+        
         if (!talhao){
             return res.status(400).json({error: 'Talhão não encontrado'}); 
         }
@@ -94,7 +103,7 @@ module.exports = {
                 return res.status(400).json({error: 'Talhão não encontrado'});               
             }
 
-            const errors = v.validate(req.body, filterValidator);
+            const errors = v.validate({nome,localizacao,desc_talhao,qtda_ha}, filterValidator);
             if (Array.isArray(errors) && errors.length){
                 return res.status(400).json(errors);
             }

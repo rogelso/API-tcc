@@ -23,6 +23,9 @@ class User extends Model{
         this.hasMany( 
             models.Safra, { foreignKey: 'id_user', as: 'safras_user'}
         );
+        this.hasMany( 
+            models.Estoque, { foreignKey: 'id_user', as: 'estoque_user'}
+        );
     }
 
 }

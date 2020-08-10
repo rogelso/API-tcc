@@ -15,6 +15,10 @@ class Safra extends Model{
      
     static associate(models){
         this.belongsTo(models.User, { foreignKey: 'id_user', as: 'users'});
+
+        this.hasMany( 
+            models.Estoque, { foreignKey: 'id_safra', as: 'produtos'}
+        );
     }
 }
 
