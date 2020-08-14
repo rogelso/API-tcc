@@ -15,7 +15,7 @@ const filterValidator = {
     kg_sc: {min:1, type: 'number'},          
     valor_unitario: {min:1, type: 'number'},
     valor_total: {min:1, type: 'number'},
-    qtd_disponivel: {min:4, type: 'number'},
+    qtd_disponivel: {min:1, type: 'number'},
     data_compra: {type: 'date', convert: true},
 
 }

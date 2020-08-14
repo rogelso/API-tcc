@@ -6,6 +6,7 @@ const Talhao = require ('../models/Talhao');
 const Safra = require ('../models/Safra');
 const Estoque = require('../models/Estoque');
 const TalhaoSafra = require('../models/TalhaoSafra');
+const Aplicacao = require('../models/Aplicacao');
 
 
 
@@ -16,12 +17,14 @@ Talhao.init(connection);
 Safra.init(connection);
 Estoque.init(connection);
 TalhaoSafra.init(connection);
+Aplicacao.init(connection);
 
 User.associate(connection.models);
 Talhao.associate(connection.models);
 Safra.associate(connection.models);
 Estoque.associate(connection.models);
 TalhaoSafra.associate(connection.models);
+Aplicacao.associate(connection.models);
 
 
 

@@ -26,6 +26,10 @@ class TalhaoSafra extends Model{
     static associate(models){
         //this.belongsTo(models.User, { foreignKey: 'id_user', as: 'user'});
         //this.belongsTo(models.Safra, { foreignKey: 'id_safra', as: 'safra'});
+
+        this.hasMany( 
+            models.Aplicacao, { foreignKey: 'id_talhao_safra', as: 'aplicacao'}
+        );
     }
 }
 

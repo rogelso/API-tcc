@@ -6,6 +6,7 @@ const TalhaoController = require('./controllers/TalhaoController');
 const SafraController = require('./controllers/SafraController');    
 const EstoqueController = require('./controllers/EstoqueController');
 const TalhaoSafraController = require('./controllers/TalhaoSafraController');
+const AplicacaoController = require('./controllers/AplicacaoController');
 
 
 routes.get('/', (req, res)=> {
@@ -62,6 +63,16 @@ routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/plan
 routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/colheita', TalhaoSafraController.updateColheitaTalhaoSafra);
 routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/finalizar-cultivo', TalhaoSafraController.updateStatusTalhaoSafra);
 routes.delete('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra', TalhaoSafraController.deleteTalhoesSafra);
+
+
+
+
+//rotas aplicacoes 
+routes.post('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao', AplicacaoController.store);
+routes.get('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao', AplicacaoController.findAllAplicacoes);
+routes.get('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplicacao', AplicacaoController.findOneAplicacoes);
+routes.put('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplicacao', AplicacaoController.updateAplicacoes);
+routes.delete('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplicacao', AplicacaoController.deleteAplicacoes);
 
 
 module.exports = routes;
