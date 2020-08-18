@@ -21,6 +21,8 @@ class Aplicacao extends Model{
      
     static associate(models){
         this.belongsTo(models.TalhaoSafra, { foreignKey: 'id_talhao_safra', as: 'aplicacoes'});
+        this.hasMany(models.ProdutosAplicados, { foreignKey: 'id_aplicacao', as: 'produtos_aplicados'});
+
     }
 }
 

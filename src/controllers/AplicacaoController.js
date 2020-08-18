@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const TalhaoSafra = require("../models/TalhaoSafra");
 const Aplicacao = require("../models/Aplicacao");
+const ProdutosAplicados = require("../models/ProdutosAplicados");
 
 
 // validator
@@ -192,6 +193,16 @@ module.exports = {
             const scanAplicacao = await Aplicacao.findByPk(id_aplicacao);
             if (!scanAplicacao){
                 return res.status(400).json({error: 'Aplicação não encontrada'});               
+            }
+
+            const [produtosAplicados] = await ProdutosAplicados.findAll({  
+                where:{
+                    id_aplicacao:id_aplicacao,
+                    id_talhao_safra: id_talhao_safra
+                },
+            });
+            if (produtosAplicados != null){
+                return res.status(400).json({error: 'Aplicação Possui produtos aplicados. Remova-os primeiro'});               
             }
             const aplicacao = await Aplicacao.destroy({
                 where: {
