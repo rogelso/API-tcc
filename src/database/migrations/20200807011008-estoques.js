@@ -31,17 +31,17 @@ module.exports = {
 
       cod_tipo_produto: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
       },
       
       variedade_insumo: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
 
       qtd_adquirida: {
         type: Sequelize.FLOAT,
-        allowNull: true,
+        allowNull: false,
       },
 
       unidade: {
@@ -56,22 +56,22 @@ module.exports = {
 
       valor_unitario: {
         type: Sequelize.FLOAT,
-        allowNull: true,
+        allowNull: false,
       },
 
       valor_total: {
         type: Sequelize.FLOAT,
-        allowNull: true,
+        allowNull: false,
       },
 
       data_compra: {
         type: Sequelize.DATE,
-        allowNull: true,
+        allowNull: false,
       },
 
       qtd_disponivel: {
         type: Sequelize.FLOAT,
-        allowNull: true,
+        allowNull: false,
       },
 
       created_at: {

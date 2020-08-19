@@ -9,10 +9,10 @@ const v = new Validator();
 const filterValidator = {
     nome_produto:{max:30, min:4, type: 'string'},
     cod_tipo_produto: {min:1, type: 'number'},
-    variedade_insumo: {max:30, min:4, type: 'string'},
+    variedade_insumo: {max:30, type: 'string'},
     qtd_adquirida: {min:1, type: 'number'},
     unidade: {max:30, min:2, type: 'string'},
-    kg_sc: {min:1, type: 'number'},          
+    kg_sc: {type: 'number'},          
     valor_unitario: {min:1, type: 'number'},
     valor_total: {min:1, type: 'number'},
     qtd_disponivel: {min:1, type: 'number'},
@@ -189,6 +189,11 @@ module.exports = {
             if (!scanProduto){
                 return res.status(400).json({error: 'Produto não encontrado'});               
             }
+
+            if (scanProduto.qtd_disponivel != scanProduto.qtd_adquirida){
+                return res.status(400).json({error: 'Este produto ja foi usado e esta aplicado a um cultivo. Não é possivel excluílo'});               
+            }
+
             const produto = await Estoque.destroy({
                 where: {
                    id: id_produto,

@@ -30,6 +30,11 @@ class TalhaoSafra extends Model{
         this.hasMany( 
             models.Aplicacao, { foreignKey: 'id_talhao_safra', as: 'aplicacao'}
         );
+        this.hasMany( 
+            models.ProdutosSementeTalhao, { foreignKey: 'id_talhao_safra', as: 'produtos_semente_area'}
+        );
+
+       
     }
 }
 

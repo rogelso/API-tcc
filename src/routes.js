@@ -8,6 +8,7 @@ const EstoqueController = require('./controllers/EstoqueController');
 const TalhaoSafraController = require('./controllers/TalhaoSafraController');
 const AplicacaoController = require('./controllers/AplicacaoController');
 const ProdutosAplicadosController = require('./controllers/ProdutosAplicadosController');
+const ProdutosSementeTalhaoController = require('./controllers/ProdutosSementeTalhaoController');
 
 
 routes.get('/', (req, res)=> {
@@ -81,6 +82,13 @@ routes.post('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplica
 routes.get('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplicacao/produtos-aplicados', ProdutosAplicadosController.findAllProdutosAplicado);
 routes.get('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplicacao/produtos-aplicados/:id_produto_aplicado', ProdutosAplicadosController.findOneProdutoAplicado);
 routes.delete('/users/:id_user/talhoes-safra/:id_talhao_safra/aplicacao/:id_aplicacao/produtos-aplicados/:id_produto_aplicado', ProdutosAplicadosController.deleteProdutoAplicado);
+
+//rotas produtos_sementes_area 
+routes.post('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-semente-talhao', ProdutosSementeTalhaoController.store);
+routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-semente-talhao', ProdutosSementeTalhaoController.findAllProdutosSementeTalhao);
+routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-semente-talhao/:id_produto_semente_talhao', ProdutosSementeTalhaoController.findOneProdutosSementeTalhao);
+routes.delete('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-semente-talhao/:id_produto_semente_talhao', ProdutosSementeTalhaoController.deleteProdutosSementeTalhao);
+
 
 
 
