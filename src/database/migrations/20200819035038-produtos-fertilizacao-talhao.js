@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('produtos_semente_talhaos', { 
+    return queryInterface.createTable('produtos_fertilizacao_talhaos', { 
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -26,17 +26,17 @@ module.exports = {
         onDelete: 'CASCADE' 
       },
       
-      variedade_semente: {
+      variedade_fertilizante: {
         type: Sequelize.STRING,
         allowNull: false,
       },
 
-      populacao_metro: {
+      qtd_adubo_ha: {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
 
-      qtd_total_semente: {
+      qtd_total_adubo: {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
@@ -53,6 +53,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('produtos_semente_areas');
+    return queryInterface.dropTable('produtos_fertilizacao_talhaos');
   }
 };

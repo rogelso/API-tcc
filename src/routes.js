@@ -9,6 +9,7 @@ const TalhaoSafraController = require('./controllers/TalhaoSafraController');
 const AplicacaoController = require('./controllers/AplicacaoController');
 const ProdutosAplicadosController = require('./controllers/ProdutosAplicadosController');
 const ProdutosSementeTalhaoController = require('./controllers/ProdutosSementeTalhaoController');
+const ProdutosFertilizacaoTalhaoController = require('./controllers/ProdutosFertilizacaoTalhaoController');
 
 
 routes.get('/', (req, res)=> {
@@ -90,6 +91,11 @@ routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/prod
 routes.delete('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-semente-talhao/:id_produto_semente_talhao', ProdutosSementeTalhaoController.deleteProdutosSementeTalhao);
 
 
+//rotas produtos_fertilizacao_area 
+routes.post('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao', ProdutosFertilizacaoTalhaoController.store);
+routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao', ProdutosFertilizacaoTalhaoController.findAllProdutosFertilizacaoTalhao);
+routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao/:id_produto_fertilizacao_talhao', ProdutosFertilizacaoTalhaoController.findOneProdutosFertilizacaoTalhao);
+routes.delete('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao/:id_produto_fertilizacao_talhao', ProdutosFertilizacaoTalhaoController.deleteProdutosFertilizacaoTalhao);
 
 
 module.exports = routes;

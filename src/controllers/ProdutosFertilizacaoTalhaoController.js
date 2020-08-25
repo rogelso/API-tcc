@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Safra = require("../models/Safra");
 const TalhaoSafra = require("../models/TalhaoSafra");
-const ProdutosSementeTalhao = require("../models/ProdutosSementeTalhao");
+const ProdutosFertilizacaoTalhao = require("../models/ProdutosFertilizacaoTalhao");
 
 
 const Estoque = require("../models/Estoque"); 
@@ -11,9 +11,9 @@ const Estoque = require("../models/Estoque");
 const Validator = require('fastest-validator');
 const v = new Validator();
 const filterValidator = {
-    variedade_semente: {max:25, min:1, type: 'string'},
-    populacao_metro:{min:1, type: 'number'},
-    qtd_total_semente: {min:1, type: 'number'}
+    variedade_fertilizante: {max:25, min:1, type: 'string'},
+    qtd_adubo_ha:{min:1, type: 'number'},
+    qtd_total_adubo: {min:1, type: 'number'}
 }
 
 module.exports = {
@@ -23,9 +23,9 @@ module.exports = {
         const {id_talhao_safra} = req.params;
     
         const id_produto = req.body.id_produto;
-        const variedade_semente = req.body.variedade_semente;
-        const populacao_metro = req.body.populacao_metro;
-        const qtd_total_semente = req.body.qtd_total_semente;
+        const variedade_fertilizante = req.body.variedade_fertilizante;
+        const qtd_adubo_ha = req.body.qtd_adubo_ha;
+        const qtd_total_adubo = req.body.qtd_total_adubo;
            
         //ver se user existe so pra ter
         const user = await User.findByPk(id_user);
@@ -39,7 +39,7 @@ module.exports = {
             return res.status(400).json({error: 'Talhao Safra não encontrado'});           
         }
         if (talhao_safra.id_user != id_user){
-            return res.status(400).json({error: 'Erro no cadastro. Talhao Safra selecionado não pertence ao usuario'});           
+            return res.status(400).json({error: 'Erro no cadastro. Talhão Safra selecionado não pertence ao usuário'});           
         }
 
         //ver se safra existe
@@ -63,27 +63,28 @@ module.exports = {
         if (produto.id_user != id_user){
             return res.status(400).json({error: 'Erro no cadastro. Este usuário naõ possui esse produto'});           
         }
-        if (produto.qtd_disponivel < qtd_total_semente){
+        if (produto.qtd_disponivel < qtd_total_adubo){
             return res.status(400).json({error: 'Erro no cadastro. ATENÇÃO! a quantidade disponível em estoque desse produto é menor do que você está atribuindo'});           
         }
 
         //ver  pra mostrar produtos disponiveis ja tem no estoque sei la
 
-        const errors = v.validate({variedade_semente,populacao_metro,qtd_total_semente}, filterValidator);
+        const errors = v.validate({variedade_fertilizante,qtd_adubo_ha,qtd_total_adubo}, filterValidator);
         if (Array.isArray(errors) && errors.length){
             return res.status(400).json(errors);
         }
+        //return res.json('teste');
 
-        const produtos_semente_area = await ProdutosSementeTalhao.create({ 
+        const produtos_fertilizante_talhao = await ProdutosFertilizacaoTalhao.create({ 
             id_talhao_safra,
             id_produto,
-            variedade_semente,
-            populacao_metro,
-            qtd_total_semente   
+            variedade_fertilizante,
+            qtd_adubo_ha,
+            qtd_total_adubo
         });
         
-        const atualizaQtdDisponivelProduto = parseFloat((produto.qtd_disponivel - qtd_total_semente).toFixed(2));
-        if(produtos_semente_area){
+        const atualizaQtdDisponivelProduto = parseFloat((produto.qtd_disponivel - qtd_total_adubo).toFixed(2));
+        if(produtos_fertilizante_talhao){
             const updateQtdDisponivelProduto = await Estoque.update({
                 qtd_disponivel:atualizaQtdDisponivelProduto
             },                
@@ -95,16 +96,17 @@ module.exports = {
                     },
                 }
             );
-            return res.json(produtos_semente_area);
+            console.log('Produto fertilização cadastrado. Estoque atualizado');
+            return res.json(produtos_fertilizante_talhao);
         }
     },
 
 
-    async findAllProdutosSementeTalhao(req, res){   
+    async findAllProdutosFertilizacaoTalhao(req, res){   
         const {id_user} = req.params;
         const {id_safra} = req.params;
         const {id_talhao_safra} = req.params;
-        const {id_produto_semente_talhao} = req.params;
+        const {id_produto_fertilizacao_talhao} = req.params;
         
         //ver se user existe so pra ter
         const user = await User.findByPk(id_user);
@@ -130,22 +132,22 @@ module.exports = {
             return res.status(400).json({error: 'O talhão selecionado não pertence a safra correspondente'});           
         }
 
-        const produtos_semente_talhao = await TalhaoSafra.findByPk(id_talhao_safra, { //busca o safra e vincula os produtos
-            include: {association: 'produtos_semente_area'}            
+        const produtos_fertilizante_talhao = await TalhaoSafra.findByPk(id_talhao_safra, { //busca o safra e vincula os produtos
+            include: {association: 'produtos_fertilizantes'}            
         });
         
-        if (!produtos_semente_talhao){
+        if (!produtos_fertilizante_talhao){
             return res.status(400).json({error: 'Não foi possível encontrar a Aplicacão'}); 
         }
-        return res.json(produtos_semente_talhao);
+        return res.json(produtos_fertilizante_talhao);
     },
 
     
-    async findOneProdutosSementeTalhao(req, res){   
+    async findOneProdutosFertilizacaoTalhao(req, res){   
         const {id_user} = req.params;
         const {id_safra} = req.params;
         const {id_talhao_safra} = req.params;
-        const {id_produto_semente_talhao} = req.params;
+        const {id_produto_fertilizacao_talhao} = req.params;
         
         //ver se user existe so pra ter
         const user = await User.findByPk(id_user);
@@ -171,29 +173,29 @@ module.exports = {
             return res.status(400).json({error: 'O talhão selecionado não pertence a safra correspondente'});           
         }
         
-        const produtos_semente_talhao = await ProdutosSementeTalhao.findOne(
+        const produto_fertilizante_talhao = await ProdutosFertilizacaoTalhao.findOne(
             { 
                 where:{
-                    id: id_produto_semente_talhao,
+                    id: id_produto_fertilizacao_talhao,
                     id_talhao_safra: id_talhao_safra
                 },
             }
         );
         
-        if (!produtos_semente_talhao){
-            return res.status(400).json({error: 'Não foi possível encontrar o registro da semente do talhão da safra'}); 
+        if (!produto_fertilizante_talhao){
+            return res.status(400).json({error: 'Não foi possível encontrar o registro do Fertilizante do talhão da safra'}); 
         }
 
-        return res.json(produtos_semente_talhao);
+        return res.json(produto_fertilizante_talhao);
     },
 
 
-    async deleteProdutosSementeTalhao(req, res){
+    async deleteProdutosFertilizacaoTalhao(req, res){
         try{
             const {id_user} = req.params;
             const {id_safra} = req.params;
             const {id_talhao_safra} = req.params;
-            const {id_produto_semente_talhao} = req.params;   
+            const {id_produto_fertilizacao_talhao} = req.params;   
             
             //ver se user existe so pra ter
             const user = await User.findByPk(id_user);
@@ -219,31 +221,31 @@ module.exports = {
                 return res.status(400).json({error: 'O talhão selecionado não pertence a safra correspondente'});           
             }
 
-            const scanProdutoSementeTalhao = await ProdutosSementeTalhao.findByPk(id_produto_semente_talhao);
-            if (!scanProdutoSementeTalhao){
-                return res.status(400).json({error: 'Registro da semente do talhão da safra não encontrado'});               
+            const scanProdutoFertilizanteTalhao = await ProdutosFertilizacaoTalhao.findByPk(id_produto_fertilizacao_talhao);
+            if (!scanProdutoFertilizanteTalhao){
+                return res.status(400).json({error: 'Registro do fertilizante do talhão da safra não foi encontrado'});               
             }
-            if (scanProdutoSementeTalhao.id_talhao_safra != id_talhao_safra){
-                return res.status(400).json({error: 'Erro. O Registro da semente do talhão da safra a ser excluído não pertence ao talhão da safra selecionado atual'});               
+            if (scanProdutoFertilizanteTalhao.id_talhao_safra != id_talhao_safra){
+                return res.status(400).json({error: 'Erro. O Registro do fertilizante do talhão da safra a ser excluído não pertence ao talhão da safra selecionado atual'});               
             }
             
             const produto = await Estoque.findOne(
                 { 
                     where:{
-                        id: scanProdutoSementeTalhao.id_produto,
+                        id: scanProdutoFertilizanteTalhao.id_produto,
                         id_user:id_user,
                         id_safra:id_safra
                     },
                 }
             );
             if(!produto){
-                return res.status(400).json({error: 'Erro ao carregar id da semente do estoque'}); 
+                return res.status(400).json({error: 'Erro ao carregar id do fertilizante do estoque'}); 
             }
-            const atualizaQtdDisponivelProduto = parseFloat((produto.qtd_disponivel + scanProdutoSementeTalhao.qtd_total_semente).toFixed(2));
+            const atualizaQtdDisponivelProduto = parseFloat((produto.qtd_disponivel + scanProdutoFertilizanteTalhao.qtd_total_adubo).toFixed(2));
 
-            const deleteProdutoSementeTalhao = await ProdutosSementeTalhao.destroy({
+            const deleteProdutoFertilizanteTalhao = await ProdutosFertilizacaoTalhao.destroy({
                 where: {
-                    id: id_produto_semente_talhao,
+                    id: id_produto_fertilizacao_talhao,
                     id_talhao_safra: id_talhao_safra                         
                 }
              }).then(function(rowDeleted){ 
@@ -262,14 +264,14 @@ module.exports = {
                     }
                 );   
                     console.log('Produto Atualizado');
-                    return res.status(200).json({sucesso: 'A Semente aplicada foi deletada, Seu Estoque foi Atualizado!'});
+                    return res.status(200).json({sucesso: 'O Fertilizante aplicado foi deletado. Seu Estoque foi Atualizado!'});
                 }else{
-                  console.log('Erro ao excluir a Semente aplicada');
+                  console.log('Erro ao excluir a fertilizante');
                   return res.status(400).json({Erro: 'Não foi possivel excluir a Semente aplicada'});
                 }
              }, function(err){
                  console.log(err);
-                 return res.status(400).json({Erro: 'Não foi possivel deletar a Aplicação'}); 
+                 return res.status(400).json({Erro: 'Não foi possivel deletar o Fertilizante'}); 
              });
         } catch (err){
             return res.status(400).json({error: err.message});            
