@@ -10,6 +10,7 @@ const Aplicacao = require('../models/Aplicacao');
 const ProdutosAplicados = require('../models/ProdutosAplicados');
 const ProdutosSementeTalhao = require('../models/ProdutosSementeTalhao');
 const ProdutosFertilizacaoTalhao = require('../models/ProdutosFertilizacaoTalhao');
+const Carga = require('../models/Carga');
 
 
 
@@ -24,7 +25,7 @@ Aplicacao.init(connection);
 ProdutosAplicados.init(connection);
 ProdutosSementeTalhao.init(connection);
 ProdutosFertilizacaoTalhao.init(connection);
-
+Carga.init(connection);
 
 User.associate(connection.models);
 Talhao.associate(connection.models);
@@ -35,6 +36,6 @@ Aplicacao.associate(connection.models);
 ProdutosAplicados.associate(connection.models);
 ProdutosSementeTalhao.associate(connection.models);
 ProdutosFertilizacaoTalhao.associate(connection.models);
-
+Carga.associate(connection.models);
 
 module.exports= connection;

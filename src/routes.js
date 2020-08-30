@@ -10,6 +10,7 @@ const AplicacaoController = require('./controllers/AplicacaoController');
 const ProdutosAplicadosController = require('./controllers/ProdutosAplicadosController');
 const ProdutosSementeTalhaoController = require('./controllers/ProdutosSementeTalhaoController');
 const ProdutosFertilizacaoTalhaoController = require('./controllers/ProdutosFertilizacaoTalhaoController');
+const CargasController = require('./controllers/CargasController');
 
 
 routes.get('/', (req, res)=> {
@@ -96,6 +97,18 @@ routes.post('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/pro
 routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao', ProdutosFertilizacaoTalhaoController.findAllProdutosFertilizacaoTalhao);
 routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao/:id_produto_fertilizacao_talhao', ProdutosFertilizacaoTalhaoController.findOneProdutosFertilizacaoTalhao);
 routes.delete('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/produtos-fertilizacao-talhao/:id_produto_fertilizacao_talhao', ProdutosFertilizacaoTalhaoController.deleteProdutosFertilizacaoTalhao);
+
+
+//rotas cargas 
+routes.post('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas', CargasController.store);
+routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas', CargasController.findAllCargasTalhao);
+routes.get('/users/:id_user/safras/:id_safra/cargas', CargasController.findAllCargasSafra);
+routes.get('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas/:id_carga', CargasController.findOneCargas);
+routes.put('/users/:id_user/safras/:id_safra/cargas/:id_carga', CargasController.updateCarga);
+routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas/:id_carga/frete-carga', CargasController.updateFreteCarga);
+routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas/:id_carga/coheita-carga', CargasController.updateColheitaCarga);
+routes.delete('/users/:id_user/safras/:id_safra/cargas/:id_carga', CargasController.deleteCarga);
+
 
 
 module.exports = routes;
