@@ -11,6 +11,7 @@ const ProdutosAplicadosController = require('./controllers/ProdutosAplicadosCont
 const ProdutosSementeTalhaoController = require('./controllers/ProdutosSementeTalhaoController');
 const ProdutosFertilizacaoTalhaoController = require('./controllers/ProdutosFertilizacaoTalhaoController');
 const CargasController = require('./controllers/CargasController');
+const VendasController = require('./controllers/VendasController');
 
 
 routes.get('/', (req, res)=> {
@@ -108,6 +109,16 @@ routes.put('/users/:id_user/safras/:id_safra/cargas/:id_carga', CargasController
 routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas/:id_carga/frete-carga', CargasController.updateFreteCarga);
 routes.put('/users/:id_user/safras/:id_safra/talhoes-safra/:id_talhao_safra/cargas/:id_carga/coheita-carga', CargasController.updateColheitaCarga);
 routes.delete('/users/:id_user/safras/:id_safra/cargas/:id_carga', CargasController.deleteCarga);
+
+
+//rotas vendas 
+routes.post('/users/:id_user/safras/:id_safra/vendas', VendasController.store);
+routes.get('/users/:id_user/safras/:id_safra/vendas', VendasController.findAllVendasSafra);
+routes.get('/users/:id_user/safras/:id_safra/vendas/vendas-soja', VendasController.findAllVendasSojaSafra);
+routes.get('/users/:id_user/safras/:id_safra/vendas/vendas-milho', VendasController.findAllVendasMilhoSafra);
+routes.get('/users/:id_user/safras/:id_safra/vendas/:id_venda', VendasController.findOneVendaSafra);
+routes.put('/users/:id_user/safras/:id_safra/vendas/:id_venda', VendasController.updateVendaSafra);
+routes.delete('/users/:id_user/safras/:id_safra/vendas/:id_venda', VendasController.deleteVendaSafra);
 
 
 

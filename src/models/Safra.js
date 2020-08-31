@@ -19,6 +19,9 @@ class Safra extends Model{
         this.hasMany( 
             models.Estoque, { foreignKey: 'id_safra', as: 'produtos'}
         );
+        this.hasMany( 
+            models.Venda, { foreignKey: 'id_safra', as: 'vendas'}
+        );
     }
 }
 
