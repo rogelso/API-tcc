@@ -29,6 +29,13 @@ class User extends Model{
         this.hasMany( 
             models.Venda, { foreignKey: 'id_user', as: 'vendas_user'}
         );
+        this.hasMany( 
+            models.Bem, { foreignKey: 'id_user', as: 'bens_user'}
+        );
+        this.hasMany( 
+            models.ControleFinanceiro, { foreignKey: 'id_user', as: 'controle_financeiro'}
+        );
+
     }
 
 }

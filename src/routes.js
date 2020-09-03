@@ -12,6 +12,9 @@ const ProdutosSementeTalhaoController = require('./controllers/ProdutosSementeTa
 const ProdutosFertilizacaoTalhaoController = require('./controllers/ProdutosFertilizacaoTalhaoController');
 const CargasController = require('./controllers/CargasController');
 const VendasController = require('./controllers/VendasController');
+const BensController = require('./controllers/BensController');
+
+const ControleFinanceiroController = require('./controllers/ControleFinanceiroController');
 
 
 routes.get('/', (req, res)=> {
@@ -120,6 +123,17 @@ routes.get('/users/:id_user/safras/:id_safra/vendas/:id_venda', VendasController
 routes.put('/users/:id_user/safras/:id_safra/vendas/:id_venda', VendasController.updateVendaSafra);
 routes.delete('/users/:id_user/safras/:id_safra/vendas/:id_venda', VendasController.deleteVendaSafra);
 
+
+//rotas Bems 
+routes.post('/users/:id_user/bens', BensController.store);
+routes.get('/users/:id_user/bens', BensController.findAllBens);
+routes.get('/users/:id_user/bens/:id_bem', BensController.findOneBem);
+routes.delete('/users/:id_user/bens/:id_bem', BensController.deleteBem);
+
+
+
+//rotas Dashboard, controle financeiro
+routes.get('/users/:id_user/safra/:id_safra/dashboard', ControleFinanceiroController.findOneControle);
 
 
 module.exports = routes;

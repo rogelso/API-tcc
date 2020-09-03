@@ -2,6 +2,7 @@ const User = require("../models/User");
 const TalhaoSafra = require("../models/TalhaoSafra");
 const Aplicacao = require("../models/Aplicacao");
 const ProdutosAplicados = require("../models/ProdutosAplicados");
+const ControleFinanceiro = require("../models/ControleFinanceiro");
 
 
 // validator
@@ -70,7 +71,35 @@ module.exports = {
             custo_total_servico   
         });
 
-        return res.json(aplicacao);
+        if(aplicacao){ 
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:talhao_safra.id_safra
+                }
+            });
+            if (scan_controle_financeiro){
+                const  custos_variaveis_totais = scan_controle_financeiro.custos_variaveis_total + custo_total_servico;
+            
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais,    
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:talhao_safra.id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(aplicacao);                
+                }else{
+                    console.log('Erro na atualização controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }
+            }
+        }
     },
 
 
@@ -146,6 +175,11 @@ module.exports = {
                 return res.status(400).json({error: 'Erro no cadastro. Talhao Safra selecionado não pertence ao usuario'});           
             }
 
+            //ver se aplicação existe
+            const aplicacao = await Aplicacao.findByPk(id_aplicacao);
+            if (!aplicacao){
+                return res.status(400).json({error: 'Aplicação não encontrada'});           
+            }
 
             const errors = v.validate({cod_tipo_aplicacao,tipo_aplicacao,nro_tratamento,data_ini_aplicacao,data_fim_aplicacao,total_horas_trabalhadas,custo_hora,custo_total_servico}, filterValidator);
             if (Array.isArray(errors) && errors.length){
@@ -172,7 +206,36 @@ module.exports = {
             );
             if (updated) {
                 const aplicacaoUpdated = await Aplicacao.findByPk(id_aplicacao);
-                return res.json(aplicacaoUpdated);
+                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:talhao_safra.id_safra
+                    }
+                });
+
+                if (scan_controle_financeiro){
+                    const  custos_variaveis_totais = parseFloat((scan_controle_financeiro.custos_variaveis_total - aplicacao.custo_total_servico) + custo_total_servico);
+
+                    const [update_controle_financeiro] = await ControleFinanceiro.update({
+                        custos_variaveis_total : custos_variaveis_totais    
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:talhao_safra.id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.json(aplicacaoUpdated);                
+                    }else{
+                        console.log('Erro na atualização controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }
+                }                                          
             }else{
                 console.log('Erro na atualização da Aplicação');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar a Aplicacão'}); 
@@ -190,6 +253,23 @@ module.exports = {
             const {id_talhao_safra} = req.params;
             const {id_aplicacao} = req.params;    
             
+            //ver se user existe
+            const user = await User.findByPk(id_user);
+            if (!user){
+                return res.status(400).json({error: 'Usuário não encontrado'});           
+            }
+
+            //ver se talhao safra existe
+            const talhao_safra = await TalhaoSafra.findByPk(id_talhao_safra);
+            if (!talhao_safra){
+                return res.status(400).json({error: 'Talhao Safra não encontrada'});           
+            }
+
+            if (talhao_safra.id_user != id_user){
+                return res.status(400).json({error: 'Erro na operacação. Talhão Safra selecionado não pertence ao usuario'});           
+            }
+
+            
             const scanAplicacao = await Aplicacao.findByPk(id_aplicacao);
             if (!scanAplicacao){
                 return res.status(400).json({error: 'Aplicação não encontrada'});               
@@ -204,6 +284,14 @@ module.exports = {
             if (produtosAplicados != null){
                 return res.status(400).json({error: 'Aplicação Possui produtos aplicados. Remova-os primeiro'});               
             }
+
+            //== ATUALIZA CONTROLE FINANCEIRO==//
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:talhao_safra.id_safra}
+            });
+
             const aplicacao = await Aplicacao.destroy({
                 where: {
                    id: id_aplicacao,
@@ -212,7 +300,34 @@ module.exports = {
                 }
              }).then(function(rowDeleted){ 
                if(rowDeleted === 1){
-                  console.log('Deleted successfully');
+                    console.log('Deleted successfully');             
+                    
+                    //== ATUALIZA CONTROLE FINANCEIRO==//                 
+                    const  custos_variaveis_totais = parseFloat(scan_controle_financeiro.custos_variaveis_total - scanAplicacao.custo_total_servico);                
+
+                    
+                    const update_controle_financeiro = ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais,
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:talhao_safra.id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.status(200).json({sucesso: 'Cultivo do Talhão Safra deletado, Dados do Controle Financeiro atualizados.'});
+                    }else{
+                        console.log('Não foi possivel atualizar o controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }
+                
+                
+                
+                
+                console.log('Deleted successfully');
                   return res.status(200).json({sucesso: 'Aplicacão deletada'});
                 }else{
                   console.log('Erro no delete da aplição');

@@ -2,13 +2,14 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('vendas', { 
+    return queryInterface.createTable('controle_financeiros', { 
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
+      
       id_user: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -24,38 +25,62 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE' 
       },
-      
-      tipo_produto: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-
-      data_venda: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      
-      qtd_sacas_venda: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      
-      preco_unitario: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-
-      deducoes_impostos: {
+    
+      receita_bruta_total: {
         type: Sequelize.FLOAT,
         allowNull: true,
       },
 
-      receita: {
+      deducoes_impostos_total: {
         type: Sequelize.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
 
+      receita_liquida_total: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
       
+      custos_variaveis_total: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      
+      lucro_bruto: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+
+      gastos_fixos_operacionais: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      
+      lucro_liquido: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+        
+      custos_depreciacoes: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+
+      lucro_saca_mcu: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+
+      ponto_equilibrio: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+
+      margem_seguranca: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -68,6 +93,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('cargas');
+    return queryInterface.dropTable('controle_financeiros');
   }
 };

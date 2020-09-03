@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Safra = require("../models/Safra");
 const Talhao = require("../models/Talhao");
 const TalhaoSafra = require("../models/TalhaoSafra");
+const ControleFinanceiro = require("../models/ControleFinanceiro");
 
 
 // validator
@@ -258,7 +259,34 @@ module.exports = {
             );
             if (updated) {
                 const talhaoSafraUpdated = await TalhaoSafra.findByPk(id_talhao_safra);
-                return res.json(talhaoSafraUpdated);
+                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra}
+                });
+                const  custos_variaveis_totais = parseFloat((scan_controle_financeiro.custos_variaveis_total - talhao_safra.custo_servico_plantio) + custo_servico_plantio);                
+                
+                
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(talhaoSafraUpdated);               
+                }else{
+                        console.log('Erro na atualização do controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }
+                               
             }else{
                 console.log('Erro na atualização do plantio');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar os Dados do Plantio'}); 
@@ -401,6 +429,14 @@ module.exports = {
             if (!scanTalhaoSafra){
                 return res.status(400).json({error: 'Talhão Safra não encontrado'});               
             }
+            
+            
+            //== ATUALIZA CONTROLE FINANCEIRO==//
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:id_safra}
+            });
             const talhao_safra = await TalhaoSafra.destroy({
                 where: {
                    id: id_talhao_safra,
@@ -409,22 +445,41 @@ module.exports = {
                 }
              }).then(function(rowDeleted){ 
                if(rowDeleted === 1){
-                  console.log('Deleted successfully');
-                  return res.status(200).json({sucesso: 'Cultivo do Talhao da Safra deletado'});
+                    console.log('Deleted successfully');             
+                    //== ATUALIZA CONTROLE FINANCEIRO==//                 
+                    const  custos_variaveis_totais = parseFloat(scan_controle_financeiro.custos_variaveis_total - scanTalhaoSafra.custo_servico_plantio);                
+
+                    
+                    const update_controle_financeiro = ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais,
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.status(200).json({sucesso: 'Cultivo do Talhão Safra deletado, Dados do Controle Financeiro atualizados.'});
+                    }else{
+                        console.log('Não foi possivel atualizar o controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }    
                 }else{
                   console.log('Erro no delete do produto');
-                  return res.status(400).json({Erro: 'Não foi possivel o cultivo do Talhao da Safra'});
-                }
+                  return res.status(400).json({Erro: 'Não foi possível deletar o cultivo do Talhão da Safra'});
+               }
              }, function(err){
                  console.log(err);
-                 return res.status(400).json({Erro: 'Não foi possivel deletar o Talhão'}); 
+                 return res.status(400).json({Erro: 'Não foi possível deletar o Talhão'}); 
              });
         } catch (err){
             return res.status(400).json({error: err.message});            
         }
     },
-    
-    
+       
 }
 
 

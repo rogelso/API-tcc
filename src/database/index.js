@@ -12,6 +12,8 @@ const ProdutosSementeTalhao = require('../models/ProdutosSementeTalhao');
 const ProdutosFertilizacaoTalhao = require('../models/ProdutosFertilizacaoTalhao');
 const Carga = require('../models/Carga');
 const Venda = require('../models/Venda');
+const Bem = require('../models/Bem');
+const ControleFinanceiro = require('../models/ControleFinanceiro');
 
 
 
@@ -28,6 +30,8 @@ ProdutosSementeTalhao.init(connection);
 ProdutosFertilizacaoTalhao.init(connection);
 Carga.init(connection);
 Venda.init(connection);
+Bem.init(connection);
+ControleFinanceiro.init(connection);
 
 User.associate(connection.models);
 Talhao.associate(connection.models);
@@ -40,5 +44,7 @@ ProdutosSementeTalhao.associate(connection.models);
 ProdutosFertilizacaoTalhao.associate(connection.models);
 Carga.associate(connection.models);
 Venda.associate(connection.models);
+Bem.associate(connection.models);
+ControleFinanceiro.associate(connection.models);
 
 module.exports= connection;

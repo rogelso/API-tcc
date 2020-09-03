@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('vendas', { 
+    return queryInterface.createTable('bems', { 
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -16,46 +16,37 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE' 
       },
-
-      id_safra: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {model: 'safras', key: 'id'},
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE' 
-      },
       
-      tipo_produto: {
+      nome_bem: {
         type: Sequelize.STRING,
         allowNull: false,
       },
 
-      data_venda: {
+      tipo: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+
+      valor_bem: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      
+      valor_depreciavel: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      
+      data_ini_dep: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      
-      qtd_sacas_venda: {
-        type: Sequelize.FLOAT,
+
+      data_fim_dep: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
-      
-      preco_unitario: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-
-      deducoes_impostos: {
-        type: Sequelize.FLOAT,
-        allowNull: true,
-      },
-
-      receita: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-
-      
+        
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

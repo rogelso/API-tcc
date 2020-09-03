@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const Safra = require("../models/Safra");
+const ControleFinanceiro = require("../models/ControleFinanceiro");
+
 
 // validator
 const Validator = require('fastest-validator');
@@ -33,7 +35,16 @@ module.exports = {
             ano_safra   
         });
 
-        return res.json(safra);
+        if (safra){
+            const id_safra = safra.id;
+            controle_financeiro = await ControleFinanceiro.create({id_user, id_safra});
+        
+            if(controle_financeiro){
+                return res.json(safra);
+            }else{
+                return res.json({error: 'Ocorreu algo de errado'})
+            }
+        }
     }, 
 
     async findAllSafrasUser(req, res){   
@@ -101,7 +112,32 @@ module.exports = {
             );
             if (updated) {
                 const safraUpdated = await Safra.findByPk(id_safra);
-                return res.json(safraUpdated);
+                                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra}
+                });
+                const  custos_fixos_total = scan_controle_financeiro.gastos_fixos_operacionais + custos_fixos_add;                
+                
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    gastos_fixos_operacionais : custos_fixos_total
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(safraUpdated);               
+                }else{
+                    console.log('Erro na atualização do controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }
             }else{
                 console.log('Erro na atualização dos custos fixos');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar os custos fixos'}); 
@@ -138,7 +174,33 @@ module.exports = {
             );
             if (updated) {
                 const safraUpdated = await Safra.findByPk(id_safra);
-                return res.json(safraUpdated);
+                                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra
+                    }
+                });
+                const  custos_fixos_total = scan_controle_financeiro.gastos_fixos_operacionais - custos_fixos_remove;                
+                
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    gastos_fixos_operacionais : custos_fixos_total
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(safraUpdated);               
+                }else{
+                    console.log('Erro na atualização do controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }                
             }else{
                 console.log('Erro na atualização dos custos fixos');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar os custos fixos'}); 
@@ -175,7 +237,32 @@ module.exports = {
             );
             if (updated) {
                 const safraUpdated = await Safra.findByPk(id_safra);
-                return res.json(safraUpdated);
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra
+                    }
+                });
+                const  custos_variaveis_totais = scan_controle_financeiro.custos_variaveis_total + manutencoes_maq_add;                
+                
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(safraUpdated);               
+                }else{
+                    console.log('Erro na atualização do controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                } 
             }else{
                 console.log('Erro na atualização dos custos de Manutencões de Máquinas');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar os custos de Manutencões de Máquinas'}); 
@@ -196,7 +283,7 @@ module.exports = {
             const safra = await Safra.findByPk(id_safra);
             if (!safra){
                 return res.status(400).json({error: 'Safra não encontrada'});               
-            } else{
+            }else{
                 const current_value = safra.manutencoes_maq;
                 manutencoes_maq = current_value - manutencoes_maq_remove;
                 manutencoes_maq = parseFloat(manutencoes_maq.toFixed(2));    
@@ -212,7 +299,32 @@ module.exports = {
             );
             if (updated) {
                 const safraUpdated = await Safra.findByPk(id_safra);
-                return res.json(safraUpdated);
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra
+                    }
+                });
+                const  custos_variaveis_totais = scan_controle_financeiro.custos_variaveis_total - manutencoes_maq_remove;                
+                
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(safraUpdated);               
+                }else{
+                    console.log('Erro na atualização do controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }
             }else{
                 console.log('Erro na atualização dos custos fixos');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar os custos fixos'}); 

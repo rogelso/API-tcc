@@ -2,6 +2,8 @@ const User = require("../models/User");
 const Safra = require("../models/Safra");
 const Venda = require("../models/Venda");
 const Op = require('sequelize');
+const ControleFinanceiro = require("../models/ControleFinanceiro");
+
 
 // validator
 const Validator = require('fastest-validator');
@@ -60,7 +62,39 @@ module.exports = {
             receita
         });
 
-        return res.json(venda);
+        if(venda){ 
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:id_safra}
+            });
+            if (scan_controle_financeiro){
+                const  receita_bruta_total = scan_controle_financeiro.receita_bruta_total + venda.receita;
+                const  deducoes_impostos_total = scan_controle_financeiro.deducoes_impostos_total + venda.deducoes_impostos;
+            
+                const receita_liquida_total = receita_bruta_total - deducoes_impostos_total;
+            
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    receita_bruta_total : receita_bruta_total,
+                    deducoes_impostos_total: deducoes_impostos_total,
+                    receita_liquida_total: receita_liquida_total
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(venda);                
+                }else{
+                    console.log('Erro na atualização do controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }
+            }
+        }
     },
 
 
@@ -211,9 +245,40 @@ module.exports = {
             );
             if (updated) {
                 const vendaUpdated = await Venda.findByPk(id_venda);
-                return res.json(vendaUpdated);
+                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra}
+                });
+                const  receita_bruta_total = (scan_controle_financeiro.receita_bruta_total - venda.receita) + receita;
+                const  deducoes_impostos_total = (scan_controle_financeiro.deducoes_impostos_total - venda.deducoes_impostos) + deducoes_impostos;
+                
+                const receita_liquida_total = receita_bruta_total - deducoes_impostos_total;
+                
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    receita_bruta_total : receita_bruta_total,
+                    deducoes_impostos_total: deducoes_impostos_total,
+                    receita_liquida_total: receita_liquida_total
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.json(vendaUpdated);               
+                    }else{
+                        console.log('Erro na atualização do controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }                                                 
+                
             }else{
-                console.log('Erro na atualização do Venda');
+                console.log('Erro na atualização da Venda');
                 return res.status(400).json({Erro: 'Não foi possível atualizar a Venda'}); 
             }
       
@@ -234,9 +299,12 @@ module.exports = {
                 return res.status(400).json({error: 'Venda não encontrada'});               
             }
 
-            // if (scanProduto.qtd_disponivel != scanProduto.qtd_adquirida){
-            //     return res.status(400).json({error: 'Este produto ja foi usado e esta aplicado a um cultivo. Não é possivel excluílo'});               
-            // }
+            //== ATUALIZA CONTROLE FINANCEIRO==//
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:id_safra}
+            });
 
             const venda = await Venda.destroy({
                 where: {
@@ -246,8 +314,32 @@ module.exports = {
                 }
              }).then(function(rowDeleted){ 
                if(rowDeleted === 1){
-                  console.log('Deleted successfully');
-                  return res.status(200).json({sucesso: 'Venda deletada'});
+                    console.log('Deleted successfully');             
+                    //== ATUALIZA CONTROLE FINANCEIRO==//                 
+                    const  receita_bruta_total = parseFloat(scan_controle_financeiro.receita_bruta_total - scanVenda.receita);
+                    const  deducoes_impostos_total = parseFloat(scan_controle_financeiro.deducoes_impostos_total - scanVenda.deducoes_impostos);
+                    
+                    const receita_liquida_total = parseFloat(receita_bruta_total - deducoes_impostos_total);
+                    
+                    const update_controle_financeiro = ControleFinanceiro.update({
+                    receita_bruta_total : receita_bruta_total,
+                    deducoes_impostos_total: deducoes_impostos_total,
+                    receita_liquida_total: receita_liquida_total
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.status(200).json({sucesso: 'Venda deletada, Dados do Controle Financeiro atualizados.'});
+                    }else{
+                        console.log('Não foi possivel atualizar o controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }  
                 }else{
                   console.log('Erro no delete da Venda');
                   return res.status(400).json({Erro: 'Não foi possivel deletar a Venda'});
