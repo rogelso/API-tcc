@@ -12,7 +12,37 @@ module.exports = {
         const {id_user} = req.params;
         const {id_safra} = req.params;
         
-        //ver se user existe so pra ter
+        //ver se user existe 
+        const load_controle_financeiro = await ControleFinanceiro.findOne(
+            { 
+                where:{
+                    id_user: id_user,
+                    id_safra: id_safra
+                },
+            }
+        );
+        if (!load_controle_financeiro){
+            return res.status(400).json({error: 'Algo de errado ocorreu ao carregar as informações.'});           
+        }
+     
+        //atualiza lucro bruto e lucro liquido
+        const lucro_bruto  = load_controle_financeiro.receita_liquida_total - load_controle_financeiro.custos_variaveis_total;
+        const lucro_liquido_ebitda  = lucro_bruto - load_controle_financeiro.gastos_fixos_operacionais;
+        
+        const controle_financeiro_refresh = await ControleFinanceiro.update(
+            { 
+                lucro_bruto:lucro_bruto,
+                lucro_liquido: lucro_liquido_ebitda
+            }, 
+            { 
+                where:{
+                    id_user: id_user,
+                    id_safra: id_safra
+                },
+            }
+        );
+
+
         const controle_financeiro = await ControleFinanceiro.findOne(
             { 
                 where:{
@@ -21,12 +51,8 @@ module.exports = {
                 },
             }
         );
-        if (!controle_financeiro){
-            return res.status(400).json({error: 'Algo de errado ocorreu ao carregar as informações.'});           
-        }
-     
-        
         return res.json(controle_financeiro);
     }
+
 
 }

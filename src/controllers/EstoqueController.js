@@ -5,6 +5,7 @@ const Estoque = require("../models/Estoque");
 
 // validator
 const Validator = require('fastest-validator');
+const ControleFinanceiro = require("../models/ControleFinanceiro");
 const v = new Validator();
 const filterValidator = {
     nome_produto:{max:30, min:4, type: 'string'},
@@ -12,7 +13,7 @@ const filterValidator = {
     variedade_insumo: {max:30, type: 'string'},
     qtd_adquirida: {min:1, type: 'number'},
     unidade: {max:30, min:2, type: 'string'},
-    kg_sc: {type: 'number'},          
+    qtd_un: {type: 'number'},          
     valor_unitario: {min:1, type: 'number'},
     valor_total: {min:1, type: 'number'},
     qtd_disponivel: {min:1, type: 'number'},
@@ -31,7 +32,7 @@ module.exports = {
         const variedade_insumo = req.body.variedade_insumo.trim();
         const qtd_adquirida = req.body.qtd_adquirida;
         const unidade = req.body.unidade.trim();
-        const kg_sc = req.body.kg_sc;
+        const qtd_un = req.body.qtd_un;
         const valor_unitario = req.body.valor_unitario;
         const valor_total = req.body.valor_total;
         const data_compra = req.body.data_compra;
@@ -54,7 +55,7 @@ module.exports = {
         }
 
 
-        const errors = v.validate({nome_produto,cod_tipo_produto,variedade_insumo,qtd_adquirida,unidade,kg_sc,valor_unitario,valor_total,data_compra,qtd_disponivel}, filterValidator);
+        const errors = v.validate({nome_produto,cod_tipo_produto,variedade_insumo,qtd_adquirida,unidade,qtd_un,valor_unitario,valor_total,data_compra,qtd_disponivel}, filterValidator);
         if (Array.isArray(errors) && errors.length){
             return res.status(400).json(errors);
         }
@@ -67,14 +68,43 @@ module.exports = {
             variedade_insumo,
             qtd_adquirida,
             unidade,
-            kg_sc,
+            qtd_un,
             valor_unitario,
             valor_total,
             data_compra,
             qtd_disponivel    
         });
 
-        return res.json(estoque);
+        if(estoque){ 
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:id_safra
+                }
+            });
+            if (scan_controle_financeiro){
+                const  custos_variaveis_totais = scan_controle_financeiro.custos_variaveis_total + valor_total;
+            
+                const [update_controle_financeiro] = await ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais,    
+                },                
+                    { 
+                        where:{
+                            id_user:id_user,
+                            id_safra:id_safra                        
+                        },
+                    }
+                );
+                if (update_controle_financeiro) {
+                    console.log('atualizado controle financeiro');
+                    return res.json(estoque);
+                }else{
+                    console.log('Erro na atualização controle financeiro');
+                    return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                }
+            }
+        }
+
     },
 
 
@@ -129,7 +159,7 @@ module.exports = {
             const variedade_insumo = req.body.variedade_insumo.trim();
             const qtd_adquirida = req.body.qtd_adquirida;
             const unidade = req.body.unidade.trim();
-            const kg_sc = req.body.kg_sc;
+            const qtd_un = req.body.qtd_un;
             const valor_unitario = req.body.valor_unitario;
             const valor_total = req.body.valor_total;
             const data_compra = req.body.data_compra;
@@ -140,7 +170,7 @@ module.exports = {
                 return res.status(400).json({error: 'Produto não encontrado'});               
             }
 
-            const errors = v.validate({nome_produto,cod_tipo_produto,variedade_insumo,qtd_adquirida,unidade,kg_sc,valor_unitario,valor_total,data_compra,qtd_disponivel}, filterValidator);
+            const errors = v.validate({nome_produto,cod_tipo_produto,variedade_insumo,qtd_adquirida,unidade,qtd_un,valor_unitario,valor_total,data_compra,qtd_disponivel}, filterValidator);
             if (Array.isArray(errors) && errors.length){
                 return res.status(400).json(errors);
             }
@@ -151,7 +181,7 @@ module.exports = {
                 variedade_insumo:variedade_insumo,
                 qtd_adquirida:qtd_adquirida,
                 unidade:unidade,
-                kg_sc: kg_sc,
+                qtd_un: qtd_un,
                 valor_unitario:valor_unitario,
                 valor_total:valor_total,
                 data_compra: data_compra,
@@ -167,7 +197,36 @@ module.exports = {
             );
             if (updated) {
                 const produtoUpdated = await Estoque.findByPk(id_produto);
-                return res.json(produtoUpdated);
+                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra
+                    }
+                });
+
+                if (scan_controle_financeiro){
+                    const  custos_variaveis_totais = parseFloat((scan_controle_financeiro.custos_variaveis_total - produto.valor_total) + valor_total);
+
+                    const [update_controle_financeiro] = await ControleFinanceiro.update({
+                        custos_variaveis_total : custos_variaveis_totais    
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.json(produtoUpdated);
+                    }else{
+                        console.log('Erro na atualização controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }
+                }          
             }else{
                 console.log('Erro na atualização do Produto');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar o Produto'}); 
@@ -189,10 +248,31 @@ module.exports = {
             if (!scanProduto){
                 return res.status(400).json({error: 'Produto não encontrado'});               
             }
-
-            if (scanProduto.qtd_disponivel != scanProduto.qtd_adquirida){
-                return res.status(400).json({error: 'Este produto ja foi usado e esta aplicado a um cultivo. Não é possivel excluílo'});               
+ 
+            //verifica se já foi utilizado
+            if(scanProduto.cod_tipo_produto == 1 || scanProduto.cod_tipo_produto == 4 ){
+                if (scanProduto.qtd_disponivel != (scanProduto.qtd_adquirida * scanProduto.qtd_un )*1000 ){
+                    return res.status(400).json({error: 'Este produto já foi usado e está aplicado à um cultivo. Não é possível excluí-lo'});               
+                }
             }
+            if(scanProduto.cod_tipo_produto == 2){
+                if (scanProduto.qtd_disponivel != scanProduto.qtd_adquirida){
+                    return res.status(400).json({error: 'Este produto já foi usado e está aplicado à um cultivo. Não é possível excluí-lo'});               
+                }
+            }
+            if(scanProduto.cod_tipo_produto == 3){
+                if (scanProduto.qtd_disponivel != scanProduto.qtd_adquirida *1000){
+                    return res.status(400).json({error: 'Este produto já foi usado e está aplicado à um cultivo. Não é possível excluí-lo'});               
+                }
+            } 
+
+
+            //== ATUALIZA CONTROLE FINANCEIRO==//
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:id_safra}
+            });
 
             const produto = await Estoque.destroy({
                 where: {
@@ -202,15 +282,36 @@ module.exports = {
                 }
              }).then(function(rowDeleted){ 
                if(rowDeleted === 1){
-                  console.log('Deleted successfully');
-                  return res.status(200).json({sucesso: 'Produto deletado'});
+                    console.log('Deleted successfully');
+
+                    //== ATUALIZA CONTROLE FINANCEIRO==//                 
+                    const  custos_variaveis_totais = parseFloat(scan_controle_financeiro.custos_variaveis_total - scanProduto.valor_total);                
+
+                    
+                    const update_controle_financeiro = ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais,
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');  
+                        return res.status(200).json({sucesso: 'Produto deletado, Dados do Controle Financeiro atualizados.'});
+                    }else{
+                        console.log('Não foi possivel atualizar o controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }
                 }else{
                   console.log('Erro no delete do produto');
                   return res.status(400).json({Erro: 'Não foi possivel deletar o Produto'});
                 }
              }, function(err){
                  console.log(err);
-                 return res.status(400).json({Erro: 'Não foi possivel deletar o Talhão'}); 
+                 return res.status(400).json({Erro: 'Não foi possível deletar o Produto'}); 
              });
         } catch (err){
             return res.status(400).json({error: err.message});            

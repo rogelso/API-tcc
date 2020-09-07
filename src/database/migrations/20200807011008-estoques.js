@@ -49,7 +49,7 @@ module.exports = {
         allowNull: false,
       },
 
-      kg_sc: {
+      qtd_un: {
         type: Sequelize.FLOAT,
         allowNull: true,
       },

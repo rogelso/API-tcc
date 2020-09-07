@@ -6,6 +6,7 @@ const Carga = require("../models/Carga");
 
 // validator
 const Validator = require('fastest-validator');
+const ControleFinanceiro = require("../models/ControleFinanceiro");
 const v = new Validator();
 const filterValidator1 = {
     tipo_produto:{max:30, min:4, type: 'string'},
@@ -306,16 +307,19 @@ module.exports = {
             if (!user){
                 return res.status(400).json({error: 'Usuário não encontrado'});           
             }
-        
+
+            //ver se carga existe
+            const carga = await Carga.findByPk(id_carga);
+            if (!carga){
+                return res.status(400).json({error: 'Carga não encontrada'});           
+            }
 
             //ver se safra existe
             const safra = await Safra.findByPk(id_safra);
             if (!safra){
                 return res.status(400).json({error: 'Safra não encontrada'});           
             }
-            // if (talhao_safra.id_safra != id_safra){
-            //     return res.status(400).json({error: 'O talhão selecionado não pertence a safra correspondente'});           
-            // }
+      
 
             const errors = v.validate({cod_tipo_custo_frete, valor_unitario_frete, valor_total_frete, status_valor_frete }, filterValidatorFrete);
             if (Array.isArray(errors) && errors.length){
@@ -337,7 +341,37 @@ module.exports = {
             );
             if (updated) {
                 const cargaUpdated = await Carga.findByPk(id_carga);
-                return res.json(cargaUpdated);
+                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra
+                    }
+                });
+
+                if (scan_controle_financeiro){
+                    const  custos_variaveis_totais = parseFloat((scan_controle_financeiro.custos_variaveis_total - carga.valor_total_frete) + valor_total_frete);
+
+                    
+                    const [update_controle_financeiro] = await ControleFinanceiro.update({
+                        custos_variaveis_total : custos_variaveis_totais    
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.json(cargaUpdated);
+                    }else{
+                        console.log('Erro na atualização controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }
+                }                                                                             
             }else{
                 console.log('Erro na atualização da Carga');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar o regitro da Carga '}); 
@@ -367,15 +401,18 @@ module.exports = {
                 return res.status(400).json({error: 'Usuário não encontrado'});           
             }
         
+            //ver se carga existe
+            const carga = await Carga.findByPk(id_carga);
+            if (!carga){
+                return res.status(400).json({error: 'Carga não encontrada'});           
+            }
 
             //ver se safra existe
             const safra = await Safra.findByPk(id_safra);
             if (!safra){
                 return res.status(400).json({error: 'Safra não encontrada'});           
             }
-            // if (talhao_safra.id_safra != id_safra){
-            //     return res.status(400).json({error: 'O talhão selecionado não pertence a safra correspondente'});           
-            // }
+ 
 
             const errors = v.validate({cod_tipo_custo_colheita, valor_unitario_colheita, valor_colheita, status_valor_colheita }, filterValidatorColheita);
             if (Array.isArray(errors) && errors.length){
@@ -397,7 +434,38 @@ module.exports = {
             );
             if (updated) {
                 const cargaUpdated = await Carga.findByPk(id_carga);
-                return res.json(cargaUpdated);
+                
+                //== ATUALIZA CONTROLE FINANCEIRO==//
+                const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                    where:{
+                        id_user:id_user, 
+                        id_safra:id_safra
+                    }
+                });
+
+                if (scan_controle_financeiro){
+                    const  custos_variaveis_totais = parseFloat((scan_controle_financeiro.custos_variaveis_total - carga.valor_colheita) + valor_colheita);
+
+                    
+                    const [update_controle_financeiro] = await ControleFinanceiro.update({
+                        custos_variaveis_total : custos_variaveis_totais    
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');
+                        return res.json(cargaUpdated);
+                    }else{
+                        console.log('Erro na atualização controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }
+                }  
+
             }else{
                 console.log('Erro na atualização da Carga');
                 return res.status(400).json({Erro: 'Não foi possivel atualizar o regitro da Carga '}); 
@@ -420,6 +488,16 @@ module.exports = {
             if (!scanCarga){
                 return res.status(400).json({error: 'Carga não encontrada'});               
             }
+
+
+            //== ATUALIZA CONTROLE FINANCEIRO==//
+            const scan_controle_financeiro = await ControleFinanceiro.findOne({
+                where:{
+                    id_user:id_user, 
+                    id_safra:id_safra}
+            });
+
+
             const carga = await Carga.destroy({
                 where: {
                    id: id_carga,
@@ -428,8 +506,28 @@ module.exports = {
                 }
              }).then(function(rowDeleted){ 
                if(rowDeleted === 1){
-                  console.log('Deleted successfully');
-                  return res.status(200).json({sucesso: 'Carga deletada'});
+                    console.log('Deleted successfully');
+
+                    //== ATUALIZA CONTROLE FINANCEIRO==//                 
+                    const  custos_variaveis_totais = parseFloat(scan_controle_financeiro.custos_variaveis_total - (scanCarga.valor_total_frete + scanCarga.valor_colheita));                
+                    
+                    const update_controle_financeiro = ControleFinanceiro.update({
+                    custos_variaveis_total : custos_variaveis_totais,
+                    },                
+                        { 
+                            where:{
+                                id_user:id_user,
+                                id_safra:id_safra                        
+                            },
+                        }
+                    );
+                    if (update_controle_financeiro) {
+                        console.log('atualizado controle financeiro');  
+                        return res.status(200).json({sucesso: 'Carga deletada, Dados do Controle Financeiro atualizados.'});
+                    }else{
+                        console.log('Não foi possivel atualizar o controle financeiro');
+                        return res.status(400).json({Erro: 'Não foi possivel atualizar o controle financeiro'}); 
+                    }                  
                 }else{
                   console.log('Erro no delete da Carga');
                   return res.status(400).json({Erro: 'Não foi possivel deletar a Carga'});

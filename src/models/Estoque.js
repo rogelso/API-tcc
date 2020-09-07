@@ -10,7 +10,7 @@ class Estoque extends Model{
             variedade_insumo: DataTypes.STRING,
             qtd_adquirida: DataTypes.FLOAT,
             unidade: DataTypes.STRING,
-            kg_sc: DataTypes.FLOAT,          
+            qtd_un: DataTypes.FLOAT,          
             valor_unitario: DataTypes.FLOAT,
             valor_total: DataTypes.FLOAT,
             data_compra: DataTypes.DATE,
