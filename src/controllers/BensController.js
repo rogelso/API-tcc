@@ -9,7 +9,6 @@ const filterValidator = {
     nome_bem: {max:30, min:4, type: 'string'},
     tipo: {max:30, min:4, type: 'string'},
     valor_bem: {min:1, type: 'number'},
-    valor_depreciavel: {min:1, type: 'number'},
     data_ini_dep: {type: 'date', convert: true},
     data_fim_dep: {type: 'date', convert: true},
 }
@@ -23,14 +22,22 @@ module.exports = {
             const nome_bem = req.body.nome_bem.trim();
             const tipo = req.body.tipo.trim();
             const valor_bem = req.body.valor_bem;
-            const valor_depreciavel = req.body.valor_depreciavel;
+            var valor_depreciavel=0;
             const data_ini_dep = req.body.data_ini_dep;
             const data_fim_dep = req.body.data_fim_dep;
 
-            const errors = v.validate({nome_bem, tipo, valor_bem, valor_depreciavel, data_ini_dep, data_fim_dep}, filterValidator);
+            const errors = v.validate({nome_bem, tipo, valor_bem, data_ini_dep, data_fim_dep}, filterValidator);
 
             if (Array.isArray(errors) && errors.length){
                 return res.status(400).json(errors);
+            }
+
+            if (tipo == 'Máquinas e Equipamentos' || tipo == "Trator"){
+                valor_depreciavel = (valor_bem - (valor_bem * 5 /100)) / 20;
+            } else if (tipo == 'Edificações'){
+                valor_depreciavel = (valor_bem - (valor_bem * 4 /100)) / 25;
+            }else{
+                valor_depreciavel = (valor_bem - (valor_bem * 10 /100)) / 10;
             }
             
             const bem = await Bem.create({
