@@ -68,7 +68,8 @@ module.exports = {
 
               
         const safra = await Safra.findOne(  //era findbypk
-            { 
+            {  
+                attributes: ['id','id_user', 'ano_safra','custos_fixos_totais'],
                 where:{
                     id: id_safra,
                     id_user:id_user                        
@@ -81,7 +82,7 @@ module.exports = {
             return res.status(400).json({error: 'Safra não encontrada'}); 
         }
 
-        return res.json(safra);
+        return res.json([safra]);
     },
 
 

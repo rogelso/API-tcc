@@ -45,13 +45,15 @@ module.exports = {
 
         const controle_financeiro = await ControleFinanceiro.findOne(
             { 
+                attributes: ['id', 'id_user','id_safra', 'receita_bruta_total', 'deducoes_impostos_total', 'receita_liquida_total', 'custos_variaveis_total', 'lucro_bruto', 'gastos_fixos_operacionais', 'lucro_liquido', 'custos_depreciacoes', 'lucro_saca_mcu', 'ponto_equilibrio', 'margem_seguranca' ],
                 where:{
                     id_user: id_user,
                     id_safra: id_safra
                 },
             }
-        );
-        return res.json(controle_financeiro);
+        );  
+
+        return res.json([controle_financeiro]);
     }
 
 

@@ -38,7 +38,7 @@ routes.delete('/users/:id_user/talhoes/:id_talhao', TalhaoController.deleteTalha
 
 
 //rota login
-routes.post('/login', UserController.login);
+//routes.post('/login', UserController.login);
 
 
 //rotas safra

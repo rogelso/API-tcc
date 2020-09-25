@@ -47,7 +47,7 @@ module.exports = {
 
       deducoes_impostos: {
         type: Sequelize.FLOAT,
-        allowNull: true,
+        allowNull: false,
       },
 
       receita: {
@@ -68,6 +68,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('cargas');
+    return queryInterface.dropTable('vendas');
   }
 };
