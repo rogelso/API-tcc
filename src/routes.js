@@ -22,7 +22,7 @@ routes.get('/', (req, res)=> {
 })
 
 //rotas users
-routes.post('/users', UserController.store);
+routes.post('/users/register', UserController.store);
 routes.get('/users', UserController.listAllUsers);
 routes.get('/users/:id_user', UserController.findOneUser); 
 routes.put('/users/:id_user', UserController.updateUser); 

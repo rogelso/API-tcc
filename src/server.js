@@ -12,7 +12,9 @@ const jwt = require('jsonwebtoken');
 const SECRET = 'tToZAZ@&78QeKPUhBm%S'; 
 
 function checkPermission(req, res, next){
-    if (req.path !== '/login'){
+    if (req.path == '/login'|| req.path == '/users/register'){
+        next();
+    } else {
         const token = req.headers['authorization'];
         if (!token) return res.status(401).send({message: 'Token não iformado'});
 
@@ -22,8 +24,7 @@ function checkPermission(req, res, next){
             req.id_user = decoded.id;
             next();
         });
-    } else {
-        next();
+       
     }
 }
 
@@ -60,11 +61,18 @@ app.post('/login', async (req,res)=>{
         console.log('Login ok');
         const id = authUser.id;
         const token = jwt.sign({id},SECRET);
+        
+        const nome = authUser.nome;
+        const sobrenome = authUser.sobrenome;
+        const email = authUser.email;
+        const cidade = authUser.cidade;
+
         console.log(token);
-        res.send({token});
+        res.send({token,id,nome,sobrenome,email,cidade});
             
     } else {
         console.log('Usuário ou Senha inválida');
         return res.status(401).json({erro: 'Usuário ou Senha inválida'});
     }                
 });
+

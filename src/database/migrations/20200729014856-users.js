@@ -41,6 +41,11 @@ module.exports = {
         defaultValue: false,
         allowNull: false,
       },
+      uf: {
+        type: Sequelize.DataTypes.STRING,
+        defaultValue: false,
+        allowNull: false,
+      },
 
       created_at: {
         type: Sequelize.DataTypes.DATE,

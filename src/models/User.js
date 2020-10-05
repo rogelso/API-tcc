@@ -8,6 +8,7 @@ class User extends Model{
             email: DataTypes.STRING,
             password: DataTypes.STRING,
             cidade: DataTypes.STRING,
+            uf: DataTypes.STRING,
         },
         {
             sequelize: connection   
