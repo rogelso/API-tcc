@@ -126,37 +126,11 @@ module.exports = {
         return res.json(vendas);
     },
 
-    async findAllVendasSojaSafra(req, res){   
+    
+    async findAllVendasByTipoProduto(req, res){   
         const {id_user} = req.params;
         const {id_safra} = req.params;
-        const {id_venda} = req.params;
-
-        //ver se user existe
-        const user = await User.findByPk(id_user);
-        if (!user){
-            return res.status(400).json({error: 'Usuário não encontrado'});           
-        }
-
-        //ver se safra existe
-        const safra = await Safra.findByPk(id_safra);
-        if (!safra){
-            return res.status(400).json({error: 'Safra não encontrada'});           
-        }
-        
-        const vendas = await Safra.findByPk(id_safra, { //busca o safra e vincula as vendas
-            include: {association: 'vendas', where: {tipo_produto: 'SOJA'}} 
-        });
-        
-        if (!vendas){
-            return res.status(400).json({error: 'Não foi possível encontrar as vendas'}); 
-        }
-        return res.json(vendas);
-    },
-
-    async findAllVendasMilhoSafra(req, res){   
-        const {id_user} = req.params;
-        const {id_safra} = req.params;
-        const {id_venda} = req.params;
+        const {tipo_produto} = req.params;
 
         //ver se user existe
         const user = await User.findByPk(id_user);
@@ -172,7 +146,7 @@ module.exports = {
         
 
         const vendas = await Safra.findByPk(id_safra, { //busca o safra e vincula as vendas
-            include: {association: 'vendas', where: {tipo_produto: 'MILHO'}} 
+            include: {association: 'vendas', where: {tipo_produto: tipo_produto}} 
         });
         
         if (!vendas){

@@ -285,7 +285,9 @@ module.exports = {
                     console.log('Deleted successfully');
 
                     //== ATUALIZA CONTROLE FINANCEIRO==//                 
-                    const  custos_variaveis_totais = parseFloat(scan_controle_financeiro.custos_variaveis_total - scanProduto.valor_total);                
+                    const  custos_variaveis_totais = parseFloat(
+                        scan_controle_financeiro.custos_variaveis_total - scanProduto.valor_total
+                    );                
 
                     
                     const update_controle_financeiro = ControleFinanceiro.update({

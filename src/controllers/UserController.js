@@ -7,16 +7,12 @@ const v = new Validator();
 const filterValidator = {
     nome: {max:30, min:4, type: 'string'},
     sobrenome: {max:30, min:4, type: 'string'},
-    email: {max:30, min:11, type: 'email'},
+    email: {max:30, type: 'email'},
     password: {max:25, min:8, type: 'string'},
     cidade: {max:30, min:5, type: 'string', trimRight:true},
     uf: {max:30, min:2, type: 'string', trimRight:true}
 }
  require('str-trim');
-// const { body } = require('express-validator');
-
-
-
 
 
 module.exports = {
@@ -142,45 +138,6 @@ module.exports = {
         } catch (err){
             return res.status(400).json({error: err.message});            
         }
-    },
-
-
-    async login(req, res){
-        try{
-            const{email, password} = req.body;    
-            const filterValidatorLogin = {
-                email: {max:30, min:11, type: 'email'},
-                password: {max:25, min:8, type: 'string'}
-            }
-            
-            const errors = v.validate(req.body, filterValidatorLogin);
-
-            if (Array.isArray(errors) && errors.length){
-                return res.status(400).json(errors);
-            }
-
-            const authUser = await User.findOne({
-                where: {
-                    email: email,
-                    password: password 
-                 }
-                }
-            );
-                
-            if(authUser){
-                console.log('Login ok');
-                return res.json(authUser);               
-            }else
-            {
-                console.log('Usuário ou Senha inválida');
-                return res.status(401).json({erro: 'Usuário ou Senha inválida'});
-            }
-             
-         } catch (err){
-             return res.status(400).json({error: err.message});            
-         }
-    },
-
-    
+    }  
 
 }

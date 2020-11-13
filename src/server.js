@@ -7,7 +7,7 @@ const Validator = require('fastest-validator');
 const v = new Validator();
 
 
-// Authorization token. para validação dos servicos da API
+// Authorization token. Para validação dos serviços da API
 const jwt = require('jsonwebtoken'); 
 const SECRET = 'tToZAZ@&78QeKPUhBm%S'; 
 

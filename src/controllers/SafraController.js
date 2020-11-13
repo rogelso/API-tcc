@@ -36,11 +36,42 @@ module.exports = {
         });
 
         if (safra){
-            const id_safra = safra.id;
-            controle_financeiro = await ControleFinanceiro.create({id_user, id_safra});
+            var id_safra = safra.id;
+            var receita_bruta_total = 0;
+            var receita_bruta_total = 0;
+            var deducoes_impostos_total= 0;
+            var receita_liquida_total = 0;
+            var custos_variaveis_total = 0;
+            var lucro_bruto = 0;
+            var gastos_fixos_operacionais = 0;         
+            var lucro_liquido = 0;
+            var custos_depreciacoes = 0;
+            var lucro_saca_mcu = 0;
+            var ponto_equilibrio = 0;
+            var margem_seguranca = 0;
+            
+            controle_financeiro = await ControleFinanceiro.create({
+                id_user, 
+                id_safra,
+                receita_bruta_total,
+                deducoes_impostos_total,
+                receita_liquida_total,
+                custos_variaveis_total,
+                lucro_bruto,
+                gastos_fixos_operacionais,
+                lucro_liquido,
+                custos_depreciacoes,
+                lucro_saca_mcu,
+                ponto_equilibrio,
+                margem_seguranca
+            });
         
             if(controle_financeiro){
-                return res.json(safra);
+                //var _idSafra = safra.id;
+                //var _anosafra = safra.ano_safra;
+                //return res.json({id:safra.id,ano_safra:safra.ano_safra});
+                return res.json([{id:safra.id,id_user:safra.id_user,ano_safra:safra.ano_safra,custos_fixos_totais:safra.custos_fixos_totais,manutencoesMaq:safra.manutencoes_maq}]);
+
             }else{
                 return res.json({error: 'Ocorreu algo de errado'})
             }
@@ -56,9 +87,8 @@ module.exports = {
         
         if (!user){
             return res.status(400).json({error: 'Usuário não encontrado'}); 
-            //passa um usuario invalido e não acha nenhuma safra
         }
-        return res.json(user);
+        return res.json(user['safras_user']);
     },
 
 

@@ -39,7 +39,7 @@ module.exports = {
             return res.status(400).json({error: 'Talhao Safra não encontrado'});           
         }
         if (talhao_safra.id_user != id_user){
-            return res.status(400).json({error: 'Erro no cadastro. Talhao Safra selecionado não pertence ao usuario'});           
+            return res.status(400).json({error: 'Erro no cadastro. Talhao Safra selecionado não pertence ao usuário'});           
         }
 
         //ver se safra existe
@@ -52,7 +52,7 @@ module.exports = {
         }
         
         //===========================================================//
-        //ver se produto existe e se tem disponvel
+        //ver se produto existe quantidade disponível
         const produto = await Estoque.findByPk(id_produto);
         if (!produto){
             return res.status(400).json({error: 'Produto não encontrado'});           
@@ -61,7 +61,7 @@ module.exports = {
             return res.status(400).json({error: 'Erro no cadastro. Produto Selecionado não corresponde a Safra selecionada'});           
         }
         if (produto.id_user != id_user){
-            return res.status(400).json({error: 'Erro no cadastro. Este usuário naõ possui esse produto'});           
+            return res.status(400).json({error: 'Erro no cadastro. Produto selecionado não pertence ao usuário'});           
         }
         if (produto.qtd_disponivel < qtd_total_semente){
             return res.status(400).json({error: 'Erro no cadastro. ATENÇÃO! a quantidade disponível em estoque desse produto é menor do que você está atribuindo'});           
