@@ -16,7 +16,7 @@ function checkPermission(req, res, next){
         next();
     } else {
         const token = req.headers['authorization'];
-        if (!token) return res.status(401).send({message: 'Token não iformado'});
+        if (!token) return res.status(401).send({message: 'Token não informado'});
 
         jwt.verify(token, SECRET, function(err, decoded){
             if (err) return res.status(500).send({message:'Acesso Negado'});

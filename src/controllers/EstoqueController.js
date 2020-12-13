@@ -51,7 +51,7 @@ module.exports = {
         }
 
         if (safra.id_user != id_user){
-            return res.status(400).json({error: 'Erro no cadastro. Safra selecionada não pertence ao usuario'});           
+            return res.status(400).json({error: 'Erro no cadastro. Safra selecionada não pertence ao usuário'});           
         }
 
 

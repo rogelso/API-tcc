@@ -45,6 +45,8 @@ module.exports = {
             return res.status(400).json({error: 'Erro no cadastro. Safra selecionada não pertence ao usuario'});           
         }
 
+        // ##verificar quantidades de sacas disponiveis para venda ##
+
 
         const errors = v.validate({tipo_produto,data_venda,qtd_sacas_venda,preco_unitario,deducoes_impostos,receita}, filterValidator);
         if (Array.isArray(errors) && errors.length){
