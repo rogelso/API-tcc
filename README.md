@@ -1,6 +1,6 @@
 # BackEnd API
 
- BackEnd para o Aplicativo mobile MeuCampo, desenvovolvido para o Trabalho de Conclusão do Curso de Sistemas de Informação 
+ BackEnd para o Aplicativo mobile MeuCampo, desenvolvido para o Trabalho de Conclusão do Curso de Sistemas de Informação 
 
 
  ## Technologies
